@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CHIEF 下厨风格测试</title>
+  <style>
+    :root {
+      --bg: #FFFBF5;
+      --panel: #ffffff;
+      --text: #2C2118;
+      --muted: #8A7060;
+      --line: #F0DEC8;
+      --soft: #FFF3E8;
+      --accent: #E07840;
+      --accent-light: #F5A06A;
+      --accent-strong: #C05C28;
+      --yellow: #F5C842;
+      --yellow-soft: #FFF9E0;
+      --green-soft: #E8F5EE;
+      --shadow: 0 16px 48px rgba(180,100,40,.1);
+      --radius: 20px;
+      --radius-sm: 12px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { min-height: 100vh; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+        "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    /* ─── LAYOUT ─── */
+    .shell { max-width: 720px; margin: 0 auto; padding: 24px 16px 80px; }
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    /* ─── SITE HEADER ─── */
+    .site-header { text-align: center; padding: 32px 16px 0; }
+    .site-logo {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 13px; font-weight: 600; color: var(--muted);
+      letter-spacing: .08em; text-transform: uppercase;
+    }
+    .logo-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); display: inline-block; }
+
+    /* ─── CARD ─── */
+    .card {
+      background: var(--panel);
+      border: 1.5px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    /* ─── LANDING ─── */
+    .hero-card {
+      padding: 52px 48px 44px; margin-top: 28px;
+      text-align: center; position: relative; overflow: hidden;
+    }
+    .hero-card::before {
+      content: ''; position: absolute; top: -80px; right: -80px;
+      width: 260px; height: 260px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(245,160,106,.15) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-card::after {
+      content: ''; position: absolute; bottom: -60px; left: -60px;
+      width: 200px; height: 200px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(245,200,66,.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-emoji { font-size: 64px; line-height: 1; margin-bottom: 20px; display: block; }
+    .hero-title {
+      font-size: 42px; font-weight: 800; letter-spacing: -.02em;
+      color: var(--text); line-height: 1.1; margin-bottom: 6px;
+    }
+    .hero-title span { color: var(--accent); }
+    .hero-sub { font-size: 16px; color: var(--muted); margin-bottom: 28px; font-weight: 500; }
+    .hero-desc {
+      background: var(--soft); border: 1px solid var(--line);
+      border-radius: var(--radius-sm); padding: 20px 24px;
+      text-align: left; margin-bottom: 32px;
+      font-size: 14px; line-height: 1.7; color: var(--muted);
+    }
+    .hero-desc p { margin-bottom: 8px; }
+    .hero-desc p:last-child { margin-bottom: 0; }
+    .dim-tags { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 36px; }
+    .dim-tag {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 6px 14px; border-radius: 100px; font-size: 12px; font-weight: 600;
+      border: 1.5px solid var(--line); background: var(--panel); color: var(--text);
+    }
+    .dim-tag-dot { width: 8px; height: 8px; border-radius: 50%; }
+    .author-info { font-size: 12px; color: var(--muted); margin-bottom: 28px; opacity: .8; }
+
+    /* ─── BUTTONS ─── */
+    .btn-primary {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      background: var(--accent); color: white; border: none;
+      border-radius: 100px; padding: 16px 40px;
+      font-size: 16px; font-weight: 700; cursor: pointer;
+      transition: all .2s; letter-spacing: .01em;
+      box-shadow: 0 4px 20px rgba(224,120,64,.35);
+      font-family: inherit;
+    }
+    .btn-primary:hover { background: var(--accent-strong); transform: translateY(-2px); box-shadow: 0 8px 28px rgba(224,120,64,.4); }
+    .btn-primary:active { transform: translateY(0); }
+    .btn-primary:disabled { opacity: .4; cursor: not-allowed; transform: none; box-shadow: none; }
+    .btn-secondary {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: transparent; color: var(--muted);
+      border: 1.5px solid var(--line); border-radius: 100px;
+      padding: 10px 20px; font-size: 13px; font-weight: 600;
+      cursor: pointer; transition: all .2s; font-family: inherit;
+    }
+    .btn-secondary:hover { border-color: var(--accent-light); color: var(--accent); }
+
+    /* ─── QUIZ ─── */
+    .quiz-header { padding: 28px 28px 0; }
+    .progress-info { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .progress-label { font-size: 13px; font-weight: 600; color: var(--muted); }
+    .progress-count { font-size: 13px; font-weight: 700; color: var(--accent); }
+    .progress-bar-wrap { height: 6px; background: var(--soft); border-radius: 100px; overflow: hidden; margin-bottom: 20px; }
+    .progress-bar-fill {
+      height: 100%; border-radius: 100px;
+      background: linear-gradient(90deg, var(--accent), var(--yellow));
+      transition: width .4s cubic-bezier(.4,0,.2,1);
+    }
+    .dim-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 4px 12px; border-radius: 100px;
+      font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+    .question-body { padding: 0 28px 28px; }
+    .question-text {
+      font-size: 18px; font-weight: 700; line-height: 1.5;
+      color: var(--text); margin-bottom: 24px;
+    }
+    .options-grid { display: flex; flex-direction: column; gap: 12px; }
+    .option-btn {
+      display: flex; align-items: flex-start; gap: 14px; width: 100%;
+      background: var(--panel); border: 2px solid var(--line);
+      border-radius: var(--radius-sm); padding: 16px 20px;
+      cursor: pointer; transition: all .18s; text-align: left; font-family: inherit;
+    }
+    .option-btn:hover { border-color: var(--accent-light); background: var(--soft); transform: translateX(4px); }
+    .option-btn.selected { border-color: var(--accent); background: var(--soft); }
+    .option-key {
+      display: flex; align-items: center; justify-content: center;
+      width: 28px; height: 28px; min-width: 28px; border-radius: 50%;
+      background: var(--soft); border: 2px solid var(--line);
+      font-size: 12px; font-weight: 800; color: var(--muted);
+      transition: all .18s;
+    }
+    .option-btn:hover .option-key,
+    .option-btn.selected .option-key { background: var(--accent); border-color: var(--accent); color: white; }
+    .option-text { font-size: 14px; line-height: 1.6; color: var(--text); padding-top: 2px; }
+    .quiz-footer { display: flex; justify-content: space-between; align-items: center; padding: 0 28px 28px; }
+
+    /* ─── RESULT ─── */
+    .result-hero { padding: 48px 40px 36px; text-align: center; }
+    .result-emoji { font-size: 56px; display: block; margin-bottom: 16px; }
+    .result-type-code { display: inline-flex; gap: 4px; margin-bottom: 12px; }
+    .code-letter {
+      width: 44px; height: 44px; display: flex; align-items: center; justify-content: center;
+      border-radius: 10px; font-size: 18px; font-weight: 800; color: white;
+    }
+    .code-letter.d0 { background: #E07840; }
+    .code-letter.d1 { background: #E04060; }
+    .code-letter.d2 { background: #40A06A; }
+    .code-letter.d3 { background: #6070C8; }
+    .code-letter.d4 { background: #D09020; }
+    .result-type-name { font-size: 26px; font-weight: 800; color: var(--text); margin-bottom: 8px; letter-spacing: -.02em; }
+    .result-dims { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; margin-bottom: 32px; }
+    .result-dim-tag { padding: 4px 12px; border-radius: 100px; font-size: 11px; font-weight: 700; border: 1.5px solid; }
+
+    .result-sections { padding: 0 28px 8px; }
+    .result-section { margin-bottom: 16px; border-radius: var(--radius); overflow: hidden; border: 1.5px solid var(--line); }
+    .result-section-header {
+      padding: 14px 20px; font-size: 12px; font-weight: 800;
+      letter-spacing: .08em; text-transform: uppercase; display: flex; align-items: center; gap: 8px;
+    }
+    .result-section-body {
+      padding: 16px 20px; font-size: 14px; line-height: 1.8;
+      color: var(--text); background: white; border-top: 1px solid var(--line);
+    }
+    .portrait-section .result-section-header { background: var(--soft); color: var(--accent-strong); }
+    .review-section  .result-section-header { background: var(--yellow-soft); color: #8A6A00; }
+    .quote-section   .result-section-header { background: var(--green-soft); color: #2A7050; }
+    .soul-quote {
+      font-style: italic; font-size: 14px; color: var(--muted);
+      border-left: 3px solid var(--accent-light); padding-left: 16px; line-height: 1.8;
+    }
+
+    /* ─── DIM BARS ─── */
+    .dim-summary-card { margin: 0 28px 28px; }
+    .dim-summary-title { padding: 16px 20px 0; font-size: 12px; font-weight: 700; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; }
+    .dim-summary { display: flex; flex-direction: column; gap: 14px; padding: 16px 20px 20px; }
+    .dim-row { display: grid; grid-template-columns: 76px 1fr 76px; align-items: center; gap: 10px; }
+    .dim-row-label-a { font-size: 11px; font-weight: 700; color: var(--muted); text-align: right; }
+    .dim-row-bar-wrap { height: 8px; background: var(--soft); border-radius: 100px; overflow: hidden; }
+    .dim-row-bar { height: 100%; border-radius: 100px; transition: width .8s cubic-bezier(.4,0,.2,1); }
+    .dim-row-label-b { font-size: 11px; font-weight: 700; color: var(--muted); text-align: left; }
+
+    /* ─── RESULT FOOTER ─── */
+    .result-footer { text-align: center; padding: 4px 28px 32px; }
+    .result-footer-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 16px; }
+    .result-footer-note { font-size: 12px; color: var(--muted); opacity: .7; }
+
+    /* ─── ANIM ─── */
+    .fade-in { animation: fadeIn .4s ease forwards; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+    .mt-24 { margin-top: 24px; }
+
+    @media (max-width: 480px) {
+      .hero-card { padding: 36px 20px 32px; }
+      .hero-title { font-size: 30px; }
+      .quiz-header, .question-body, .quiz-footer { padding-left: 18px; padding-right: 18px; }
+      .result-hero { padding: 36px 20px 28px; }
+      .result-sections { padding: 0 18px 8px; }
+      .dim-summary-card { margin: 0 18px 24px; }
+      .result-footer { padding: 4px 18px 28px; }
+      .dim-row { grid-template-columns: 60px 1fr 60px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════ SCREEN 1: LANDING ══════════════ -->
+<div id="screen-landing" class="screen active">
+  <div class="shell">
+    <header class="site-header">
+      <div class="site-logo">
+        <span class="logo-dot"></span>Chef Personality Lab<span class="logo-dot"></span>
+      </div>
+    </header>
+    <div class="card hero-card mt-24 fade-in">
+      <span class="hero-emoji">🍳</span>
+      <div class="hero-title">CHIEF<br><span>下厨风格</span>测试</div>
+      <div class="hero-sub">发现你的灶台灵魂，从 32 种下厨人格中找到你</div>
+      <div class="hero-desc">
+        <p>🔬 通过 <strong>5 个核心维度</strong>、<strong>20 道选择题</strong>，深度解析你的下厨风格。</p>
+        <p>⏱ 大约需要 <strong>3 分钟</strong>完成。</p>
+        <p>💡 不存在好坏之分，每一种厨魂都值得被看见。</p>
+      </div>
+      <div class="dim-tags">
+        <div class="dim-tag"><span class="dim-tag-dot" style="background:#E07840"></span>Control · 掌控度</div>
+        <div class="dim-tag"><span class="dim-tag-dot" style="background:#E04060"></span>Health · 健康观</div>
+        <div class="dim-tag"><span class="dim-tag-dot" style="background:#40A06A"></span>Ingredient · 哲学观</div>
+        <div class="dim-tag"><span class="dim-tag-dot" style="background:#6070C8"></span>Environment · 环境观</div>
+        <div class="dim-tag"><span class="dim-tag-dot" style="background:#D09020"></span>Form · 表现欲</div>
+      </div>
+      <div class="author-info">由 <strong>青小厨</strong> 设计制作 &nbsp;·&nbsp; CHIEF 厨魂人格测试 v1.0</div>
+      <button class="btn-primary" onclick="startQuiz()">🚀 开始测试</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ SCREEN 2: QUIZ ══════════════ -->
+<div id="screen-quiz" class="screen">
+  <div class="shell">
+    <div class="card mt-24">
+      <div class="quiz-header">
+        <div class="progress-info">
+          <span class="progress-label" id="progress-label">第 1 题，共 20 题</span>
+          <span class="progress-count" id="progress-count">1 / 20</span>
+        </div>
+        <div class="progress-bar-wrap">
+          <div class="progress-bar-fill" id="progress-bar" style="width:5%"></div>
+        </div>
+        <div class="dim-badge" id="dim-badge"></div>
+      </div>
+      <div class="question-body">
+        <div class="question-text" id="question-text"></div>
+        <div class="options-grid" id="options-grid"></div>
+      </div>
+      <div class="quiz-footer">
+        <button class="btn-secondary" id="btn-prev" onclick="prevQuestion()" style="visibility:hidden">← 上一题</button>
+        <button class="btn-primary" id="btn-next" onclick="nextQuestion()" disabled>下一题 →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ SCREEN 3: RESULT ══════════════ -->
+<div id="screen-result" class="screen">
+  <div class="shell">
+    <div class="card mt-24 fade-in">
+      <div class="result-hero">
+        <span class="result-emoji" id="result-emoji">🍳</span>
+        <div class="result-type-code" id="result-type-code"></div>
+        <div class="result-type-name" id="result-type-name"></div>
+        <div class="result-dims" id="result-dims"></div>
+      </div>
+      <div class="result-sections">
+        <div class="result-section portrait-section">
+          <div class="result-section-header">🎭 深度画像</div>
+          <div class="result-section-body" id="result-portrait"></div>
+        </div>
+        <div class="result-section review-section">
+          <div class="result-section-header">💬 真实评价</div>
+          <div class="result-section-body" id="result-review"></div>
+        </div>
+        <div class="result-section quote-section">
+          <div class="result-section-header">🎤 灵魂台词</div>
+          <div class="result-section-body"><div class="soul-quote" id="result-quote"></div></div>
+        </div>
+      </div>
+      <div class="card dim-summary-card" style="border-color:var(--line)">
+        <div class="dim-summary-title">你的五维画像</div>
+        <div class="dim-summary" id="dim-summary"></div>
+      </div>
+      <div class="result-footer">
+        <div class="result-footer-actions">
+          <button class="btn-secondary" onclick="showScreen('landing')">← 返回首页</button>
+          <button class="btn-primary" onclick="startQuiz()">🔄 重新测试</button>
+        </div>
+        <div class="result-footer-note">CHIEF 厨魂测试 · 由青小厨设计 · 共 32 种人格 · 仅供娱乐</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════
+// DIMENSION META
+// ════════════════════════════════════════
+const dimensions = [
+  { name:'Control · 掌控度',      color:'#E07840', bg:'#FFF0E8', optA:'Precision · 精密派', optB:'Intuition · 直觉派', la:'P', lb:'I' },
+  { name:'Health · 健康观',        color:'#E04060', bg:'#FFF0F2', optA:'Flavor · 风味至上',  optB:'Balance · 均衡至上', la:'F', lb:'B' },
+  { name:'Ingredient · 哲学观',    color:'#40A06A', bg:'#E8F5EE', optA:'Nature · 原味派',   optB:'Technique · 技法派', la:'N', lb:'T' },
+  { name:'Environment · 环境观',   color:'#6070C8', bg:'#EEF0F8', optA:'Order · 秩序派',    optB:'Chaos · 狂野派',    la:'O', lb:'C' },
+  { name:'Form · 表现欲',          color:'#D09020', bg:'#FFF8E0', optA:'Aesthetic · 审美派', optB:'Utility · 实用派',  la:'A', lb:'U' }
+];
+
+// ════════════════════════════════════════
+// QUESTIONS  [题目, A选项, B选项, 维度索引]
+// ════════════════════════════════════════
+const questions = [
+  // Control (dim 0)  A=P精密  B=I直觉
+  ['菜谱上写着"少许/适量/酌情"，你的第一反应是：',
+   '这种菜谱写了跟没写有什么区别？甚至想顺着网线过去把作者的键盘扣了。',
+   '这才是厨艺的留白！手一抖、眼一闭，那一刻灵魂会告诉你放多少。', 0],
+  ['煮一份意大利面，包装袋说要煮 9 分钟，你会：',
+   '掏出手机，定个 8 分 55 秒的闹钟，多一秒都怕它失去了那股该死的韧劲。',
+   '随手扔进锅里。几分钟？等我这局游戏打完，或者等我闻到那股面香味儿。', 0],
+  ['如果家里没有菜谱里要求的"灵魂香料"了，你会：',
+   '熄火，下楼买。没有罗勒的青酱意面，那只能叫"绿色的面条糊糊"。',
+   '冰箱里有啥放啥。没有香菜放香葱，没有香葱放芹菜，主打一个"随缘流体力学"。', 0],
+  ['关于电子秤的使用频率：',
+   '只要开火，它就必须在操作台上待命，0.1 克的误差是我最后的尊严。',
+   '它是用来称快递包裹重没重，或者用来提醒我最近是不是又胖了的。', 0],
+  // Health (dim 1)  A=F风味  B=B均衡
+  ['面对锅底那层煎完肉剩下的油渣和油脂：',
+   '扔掉？你疯了吗！那是这顿饭的精华，拌饭能让我多吃三碗。',
+   '那是流动的血脂，是心内科医生的 KPI。洗洁精，立刻，马上！', 1],
+  ['晚上十点半，你的胃开始疯狂尖叫，你会：',
+   '炸个鸡、煮碗螺蛳粉加满鸭掌。人生苦短，胃不能亏。',
+   '灌两口温开水，或者啃一根冷冰冰的黄瓜，欺骗大脑它已经饱了。', 1],
+  ['在你眼里，沙拉这东西存在的意义是：',
+   '它是蛋黄酱和芝士碎的最佳载体。没有酱，那就是一盆绿色的观赏植物。',
+   '它是身体的净化器。每一片叶子都在清洗我被奶茶玷污的灵魂。', 1],
+  ['对于"低糖低盐低油"的健康餐，你的评价是：',
+   '承认吧，你那是饲料。狗都不吃，我为什么要吃？',
+   '这是对生命的敬畏。那些被重油重盐摧残的人，不懂这种轻盈的高级感。', 1],
+  // Ingredient (dim 2)  A=N原味  B=T技法
+  ['买了一块顶级和牛，你打算怎么施展？',
+   '盐！黑胡椒！火！别给我整那些乱七八糟的酱，那是在侮辱这头牛的履历。',
+   '哪怕是 A5，我也得用复杂的酱汁和低温慢煮把它蹂躏出我的个人风格。', 2],
+  ['面对冰箱里那些快过期的、蔫了的边角料：',
+   '这种垃圾食材不配进我的锅，直接进垃圾桶是它最后的体面。',
+   '只要调料给得够，技法使得对，枯木也能逢春，烂菜也能化神！', 2],
+  ['如果一个菜很难吃，你觉得根本原因是：',
+   '买菜的人瞎了，这食材本身就是个残次品，神仙也救不活。',
+   '厨师的手残了，火候没对，或者调料的逻辑链条断裂了。', 2],
+  ['你更崇拜哪种厨师？',
+   '满世界跑、只为寻找那一颗清晨带露珠的松茸的极致采买狂。',
+   '能在路边大排档用破锅烂灶炒出一盘惊世绝学的街头炼金术士。', 2],
+  // Environment (dim 3)  A=O秩序  B=C狂野
+  ['你做饭时，如果有人突然进厨房，他会看到：',
+   '所有食材各就其位，垃圾桶里空空如也，灶台干净得能倒映出你的脸。',
+   '像刚被哈士奇拆过的案板，漫天飞舞的葱皮，以及正在沸腾但没人管的锅。', 3],
+  ['关于"洗碗"这件小事：',
+   '菜下锅了？趁着炒菜的空档，把刚才用的刀和碗洗了，这叫"战术闭环"。',
+   '吃完再说，或者明天再说。现在我的眼里只有肉，洗碗是下个世纪的事。', 3],
+  ['切菜时有一块胡萝卜滚到了地上：',
+   '停止一切动作，捡起来，擦地，洗手，重启流程。',
+   '脚尖轻轻一勾，把它踢进冰箱缝里。眼不见，心不乱。', 3],
+  ['你的做饭动线通常是：',
+   '丝滑的。从冰箱到水池再到灶台，每一步都像经过了工业工程学设计。',
+   '蹦迪式的。在这儿找锅盖，在那儿找铲子，顺便还要跨过地上的垃圾袋。', 3],
+  // Form (dim 4)  A=A审美  B=U实用
+  ['菜出锅了，你的第一反应是：',
+   '别动！先找光！换个盘子！撒点葱花点缀！朋友圈没吃，谁也不许吃！',
+   '拿锅铲直接扒拉进碗里。趁热吃啊！等拍完照，那股锅气都没了！', 4],
+  ['你的餐具库里，占比最高的是：',
+   '各种奇形怪状、纯手工感、甚至装不了一两肉的"高格调"碟子。',
+   '能进微波炉、摔不碎、容量大、最好直接能当储物盒的实用货。', 4],
+  ['一个人在家吃泡面，你会：',
+   '必须找个漂亮的碗盛出来，还要煎个完美的蛋，摆个精致的 Pose。',
+   '连碗都不用，直接对着锅吃，省下来的洗碗时间不香吗？', 4],
+  ['如果一道菜长得像某种不可名状的排泄物，但味道是米其林三星：',
+   '婉拒了哈。我的眼睛受不了这种委屈，视觉污染会直接导致食欲丧失。',
+   '关了灯不都一样？好吃就行，我的胃又没长眼睛。', 4],
+];
+
+// ════════════════════════════════════════
+// 32 PERSONALITY TYPES
+// Code: [Control P/I][Health F/B][Ingredient N/T][Environment O/C][Form A/U]
+// ════════════════════════════════════════
+const P = {
+  PFNOA: { emoji:'🔬', name:'米其林实验室主任',
+    dims:['精密(P)','风味(F)','原味(N)','秩序(O)','审美(A)'],
+    portrait:'你是厨房里的极致完美主义者。你对食材的挑选近乎苛刻，如果和牛的纹路没达到 A5 级，你绝不会动用你的红外测温仪。你的烹饪过程像是一场精密的手术，量勺和计时器是你最亲密的战友。你追求的是那种在绝对秩序下诞生的、带有艺术感的风味极致。',
+    review:'你是所有厨师里最让人放心的，也是最让人压力大的。你的作品无可挑剔，摆盘美到可以送进卢浮宫。但承认吧，你做的每一顿饭都像是一次高精尖科研项目，为了吃你这顿饭，别人可能得提前洗个澡以示尊重。',
+    quote:'"盐放多了 0.2 克，这破坏了食材本身的矿物质甜感。另外，请不要用那个破坏色彩平衡的蓝碟子装这块肉。"' },
+
+  PFNOU: { emoji:'🥩', name:'精准风味工程师',
+    dims:['精密(P)','风味(F)','原味(N)','秩序(O)','实用(U)'],
+    portrait:'你是一个极其务实的风味追求者。你用精密的方式对待每一个步骤，坚信优质的原料加上严谨的火候就是完美的答案。你的厨房整洁有序，每一步都经过计算。但你不需要把菜摆成艺术品——好吃，并让别人真正吃到，才是你的终极目标。',
+    review:'你是那种"只讲结果不讲排场"的厨房实干家。你做的饭确实好吃，流程清晰，数据好看。但你宁愿让人记住那个味道，也不愿意花时间摆盘。效率和风味是你的双核驱动，其他都是废话。',
+    quote:'"食材好，火候准，就是好菜。盘子好看有什么用？又不能吃。赶紧趁热，别浪费这锅气。"' },
+
+  PFNCA: { emoji:'🌋', name:'失控的实验室疯子',
+    dims:['精密(P)','风味(F)','原味(N)','狂野(C)','审美(A)'],
+    portrait:'逻辑与混乱的奇妙结合。你一边疯狂地往地上扔包装袋，一边死死盯着红外线测温计。你对顶级食材有偏执的尊重，并试图用最硬核的手段压榨出它的极限风味。你整个人看起来像刚从火灾现场逃出来，但你端出的菜却美得像艺术品。',
+    review:'你是个迷人的矛盾体。你对细节的把控达到了病态的程度，但对空间的要求几乎为零。你做的菜确实好吃到让人流泪，但吃完后看着那个像被野猪群洗劫过的厨房，别人也会想流泪。你是那种"一顿饭烧掉一个厨房"的传奇。',
+    quote:'"别动！这个美拉德反应正处于临界点！乱？这叫热力学第二定律，在熵增的过程中寻找美味的定格。"' },
+
+  PFNCU: { emoji:'💥', name:'战损版风味精算师',
+    dims:['精密(P)','风味(F)','原味(N)','狂野(C)','实用(U)'],
+    portrait:'你是逻辑与暴力美学的结合。你精准地计算火候和食材配比，却完全不在意厨房是否沦陷。你崇尚食材原力，追求极致的冲击力。你的厨房虽然脏乱，但端出的每一口肉都精准击中味蕾。',
+    review:'你做饭时的气压极高，方圆三米没人敢靠近。你精准复刻出的那种极致美味，通常是建立在邻居以为你家着火了的基础上的。你做的饭确实好吃到让人流泪，但吃完后看着那个像废墟一样的厨房，别人也想流泪。',
+    quote:'"只要火候差了 3 秒，这块肉的汁水就会流失。乱？别管那些，趁这口锅气还没散，赶紧把它吞了！"' },
+
+  PFTOA: { emoji:'📜', name:'正宗原教旨守护者',
+    dims:['精密(P)','风味(F)','技法(T)','秩序(O)','审美(A)'],
+    portrait:'你是某种烹饪文明的守护者。无论是法式高汤还是中菜繁琐步骤，你都复刻得严丝合缝。你对"正宗"有着病态的执念，你会为了做一个酱汁连续熬煮 48 小时。你的厨房是纪律的代名词，每一道菜都是你技艺的奖杯。',
+    review:'你是一个值得尊敬的工匠，但也确实活得太沉重了。你对传统的敬畏让你显得像个老古董。你端出的菜像是一堆昂贵调料和时间的尸体堆砌成的艺术品。虽然很牛，但真的，大家有时候只是想吃顿简简单单的饭，而不是听你讲 19 世纪的烹饪史。',
+    quote:'"这道油封鸭的误差不能超过 1%。你看这酱汁的厚度，这是经过四次浓缩的结果。任何随意的改动都是对烹饪文明的背叛。"' },
+
+  PFTOU: { emoji:'🏛️', name:'古典主义的坚守者',
+    dims:['精密(P)','风味(F)','技法(T)','秩序(O)','实用(U)'],
+    portrait:'你是个典型的老派厨师。你对正宗技法有偏执，对秩序有洁癖。你精准地执行每一个步骤，追求那种教科书式的稳定风味。你不搞花哨的摆盘，你认为厚重的味道本身就是最高级的语言。',
+    review:'你是那种最适合开社区神级小店的人，稳得让人想哭。但你的刻板也让人觉得无趣，你拒绝任何改良，拒绝任何社交属性。你活在自己的味觉闭环里，像个守墓人一样守护着那些可能已经过时的繁琐技法。',
+    quote:'"火候多一秒，勾芡少一分，这就不是那道菜了。规则就是规则，不需要拍照，好吃都在舌头上。"' },
+
+  PFTCA: { emoji:'🎆', name:'失控的味觉雕塑家',
+    dims:['精密(P)','风味(F)','技法(T)','狂野(C)','审美(A)'],
+    portrait:'你是个疯狂的实验员。你精准计算调料比例，追求风味的重叠，且必须以极度夸张的造型呈现。虽然你的厨房已经像被炸过，但你依然在废墟中坚持最后的审美。',
+    review:'你是一个极具天赋的破坏者。你做的东西往往具有令人窒息的美感和风味深度，但你整个人看起来像刚从火灾现场逃出来。你是那种为了"一盘菜"能把"一家人"逼疯的典型。',
+    quote:'"调料的误差不能超过 1 克！我知道这里很乱，但这叫热力学第二定律。看这色泽，它是艺术！"' },
+
+  PFTCU: { emoji:'⚙️', name:'冷酷的调味黑客',
+    dims:['精密(P)','风味(F)','技法(T)','狂野(C)','实用(U)'],
+    portrait:'你不在乎食材原本高不高贵，你只相信通过硬核技法和精准配比能收割风味。你的厨房像个重工业现场，你熟练地运用高温、油脂和各种复合调料，追求那种工业化级别的爽感。',
+    review:'你的味觉早就被重口味摧毁了。你所谓的"风味极致"，其实就是用厚重的调料进行的一场暴力强奸。你就像是一个黑客，通过破解味觉密码来让人上瘾。谁要是天天吃你做的饭，不出三个月绝对得去查查血压。',
+    quote:'"只要技法到位，边角料也能吃出米其林感。看这层芡汁的折射率，我就知道它的咸鲜比达到了巅峰。"' },
+
+  PBNOA: { emoji:'🌿', name:'极简养生美学家',
+    dims:['精密(P)','均衡(B)','原味(N)','秩序(O)','审美(A)'],
+    portrait:'你是一个追求极致平衡的人。你精确计算每一克食材的营养价值，坚信优质原料本身就是最好的滋养。你的厨房整洁得像个设计作品，摆盘的美感是你对自己生活态度的最后宣言。健康、秩序、美感——你一样都不肯将就。',
+    review:'你活得非常精致，也精致到有点让人累。你做的东西既健康又好看，唯独缺了那么一点烟火气。你永远无法感受到路边摊的那种生猛和豪放，但你的生活方式确实让许多人望而生羡，然后望而却步。',
+    quote:'"这颗有机番茄的切片厚度是 0.3 厘米，确保了视觉和营养的双重最优。食材本身就是艺术，只需要恰当地呈现。"' },
+
+  PBNOU: { emoji:'📊', name:'数字生命补给员',
+    dims:['精密(P)','均衡(B)','原味(N)','秩序(O)','实用(U)'],
+    portrait:'你是极致的自律怪。厨房对你来说只是一个"精准获取微量元素"的舱室。你买最好的有机食材，用最严谨的克数去配比，然后用最整洁的流程将它们处理熟。你不迷恋调味，你迷恋的是体脂率和体检报告上的绿灯。',
+    review:'你不是在做饭，你是在完成生存 KPI。你这种冷冰冰的秩序感让人敬畏，也让人同情。承认吧，你做的东西狗都不吃，因为狗受不了那种完全没有油脂的干柴感。你所谓的"健康"，本质上是一种对味觉欲望的霸凌。',
+    quote:'"这顿午餐的升糖指数完美控制在 50 以内。多加一滴油都是对这份逻辑的破坏，口感这种主观偏差不在我的考量范围。"' },
+
+  PBNCA: { emoji:'⚖️', name:'混乱中的苦行僧',
+    dims:['精密(P)','均衡(B)','原味(N)','狂野(C)','审美(A)'],
+    portrait:'你是一个矛盾的养生狂。你对克数有执念，却对环境无能为力。你坚持要在瓦砾堆里摆出一份充满自然气息、不带烟火气的拼盘。这种在混乱中追求洁净的行为带有一种悲剧英雄色彩。',
+    review:'你的生活状态看起来很焦虑。你试图通过控制食物来获得掌控感，但你连灶台都管不好。你做的东西确实健康，但吃你做的饭会让人感到一种莫名的沉重——那种为了"正确"而挣扎的沉重。',
+    quote:'"虽然还没洗碗，但这颗番茄的切片厚度达到了完美的统一。这种自然的秩序，才是最好的补药。"' },
+
+  PBNCU: { emoji:'🪨', name:'硬核生存主义者',
+    dims:['精密(P)','均衡(B)','原味(N)','狂野(C)','实用(U)'],
+    portrait:'你是那种在极端环境下活得最好的人。你不需要仪式感，甚至不需要干净的台面，你只需要精准的蛋白质和碳水。你把烹饪降级为物理堆砌，一切只为生存。',
+    review:'你对食物的冷淡让人肃然起敬。你不是在糊弄，你只是觉得为了吃这件事浪费精力简直是文明的退步。你做的东西狗都不吃，但你确实比狗活得健壮且长久。',
+    quote:'"能量够了，指标对齐了。乱不乱无所谓，反正是要吃下去的。下一顿是什么时候？"' },
+
+  PBTOA: { emoji:'🎭', name:'伪善的精致养生家',
+    dims:['精密(P)','均衡(B)','技法(T)','秩序(O)','审美(A)'],
+    portrait:'你最虚伪的地方在于，你既想要健康的身体，又想要五星级的虚荣心。你用精密到变态的技法去折腾低脂食材，只为让它们看起来不那么凄惨。你的厨房像个样板间，充满了算计。',
+    review:'你活得累不累？你折腾两小时，就为了那两口健康餐？你所有的技法都是为了掩盖乏味，结果就是形式大于内容。你不是在吃饭，你是在为了那张"完美生活"的标签进行自我虐待。',
+    quote:'"我用分子料理的技术处理了甜菜根，确保热量为零的同时视觉达到巅峰。拍完照了吗？可以开吃了。"' },
+
+  PBTOU: { emoji:'🏭', name:'工业化长寿精算师',
+    dims:['精密(P)','均衡(B)','技法(T)','秩序(O)','实用(U)'],
+    portrait:'你把身体当成精密仪器，把厨房当成燃料加工厂。你并不迷恋昂贵的食材，你更相信通过现代技法（如低温慢煮、高速破壁）来压榨出每一丝科学的营养。你的生活极度自律，每一餐的宏量元素都在你的 Excel 表格里跳动。',
+    review:'你是现代都市里最清醒的生存专家。你证明了"活着"和"进食"可以被高度标准化。你做饭的效率让人惊叹，但也冷静得让人害怕。如果你能偶尔在饭里加一点点"不健康"的油脂，你的人生可能会更有趣一点，而不是像个生物模拟器。',
+    quote:'"这块鸡胸肉经过了 62 度 2 小时的低温灭菌，完美保留了蛋白质活性。味道不重要，重要的是它能撑起我下午 4 个小时的高强度脑力工作。"' },
+
+  PBTCA: { emoji:'🧪', name:'精致的克制美学大师',
+    dims:['精密(P)','均衡(B)','技法(T)','狂野(C)','审美(A)'],
+    portrait:'你是一个矛盾的疯子。你在满是油烟和杂乱的战场上，精准地利用低温慢煮或真空萃取来处理那些寡淡的健康食材。你对自己身体的控制欲极强，且要求最后端出来的作品必须具有高级的视觉张力。',
+    review:'你是个典型的"装腔作势者"。你折腾两个小时，就为了那两口还没猫食饱的健康餐。你所有的技法都是为了掩盖健康食材那难以忍受的乏味。虽然过程像炸了实验室，但最后那盘菜确实看起来贵得离谱。',
+    quote:'"我用 60 度精准处理了这些甜菜根，确保在低热量的前提下达到视觉的巅峰。虽然厨房现在一塌糊涂，但这并不影响作品的纯净。"' },
+
+  PBTCU: { emoji:'🤖', name:'冷血效率机器人',
+    dims:['精密(P)','均衡(B)','技法(T)','狂野(C)','实用(U)'],
+    portrait:'你是现代都市生存的终极方案。你通过精密计算和高效技法，在对环境毫无要求的情况下生产出标准化的健康餐。你追求的是极高的投入产出比，拒绝一切感性的干扰。',
+    review:'你的人生可能和你的备餐盒一样，虽然井井有条，但毫无意外。你把烹饪这个充满烟火气的行为，降维成了一场枯燥的数据演算。你做的东西确实能维持生命，但如果你邀请别人共进晚餐，那简直是一场关于"营养成分表"的社交酷刑。',
+    quote:'"这套做饭流程我已经优化到了 15 分钟，包含洗碗。吃，只是为了活着，多余的修饰是对效率的背叛。"' },
+
+  IFNOA: { emoji:'✍️', name:'随性生活的视觉诗人',
+    dims:['直觉(I)','风味(F)','原味(N)','秩序(O)','审美(A)'],
+    portrait:'你追求那种"轻盈的优雅"。你不需要菜谱，因为你相信审美会引导风味。你在整洁的厨房里随性挥洒，追求食材本味与视觉美感的和谐。你做饭时像在写散文，松弛、自然、且非常出片。',
+    review:'你是朋友圈里最让人羡慕的那种厨师，生活状态极佳。但有时候你的"随性"会让风味变得不稳定——看心情下厨的后果就是，大家永远不知道今天这道菜是惊艳还是平庸。你太在意美感，偶尔会忘了味道才是硬道理。',
+    quote:'"今天阳光的色温很适合这道清蒸鱼，我只撒了一点粉盐，为了不破坏那层透明的质感。"' },
+
+  IFNOU: { emoji:'🏠', name:'可靠的家庭主理人',
+    dims:['直觉(I)','风味(F)','原味(N)','秩序(O)','实用(U)'],
+    portrait:'你是那种最让人有安全感的厨师。你有一套成熟的经验，知道什么样的食材配什么样的火候。你做事利索，讲究顺手，从不搞花哨装饰，但每顿饭都能让人吃出温情。',
+    review:'你才是真正懂生活的人。你不被教条束缚，追求扎扎实实的满足。虽然你的菜可能不够"高级"，不能发朋友圈，但它是能让你在疲惫一天后真正想吃的东西。你才是厨房的定海神针。',
+    quote:'"盐放多少？手抓一把就知道了。别整那些摆盘，趁热吃是对菜最大的尊重。"' },
+
+  IFNCA: { emoji:'🎨', name:'失控的色彩天才',
+    dims:['直觉(I)','风味(F)','原味(N)','狂野(C)','审美(A)'],
+    portrait:'你是厨房里的凡高。你迷恋食材本色，在混乱中挥洒色彩。你不记配比，靠鼻子感知风味。你的成品通常有一种粗犷但惊艳的美感，像是在废墟上开出的繁花。',
+    review:'你是一个极具激情的破坏者。你的厨房通常充满了类似干冰升华或油锅轰鸣的奇观。你端出来的菜确实有生命力，但你整个人看起来像刚从战场回来。你的这种"狂野审美"是一把双刃剑，爱的人极爱，恨的人觉得你是个疯子。',
+    quote:'"不需要精确，只需要感受！你看这和牛的红色在锅里定格，这就是大地的色彩！"' },
+
+  IFNCU: { emoji:'🍢', name:'深夜排挡的民间灶神',
+    dims:['直觉(I)','风味(F)','原味(N)','狂野(C)','实用(U)'],
+    portrait:'你不需要菜谱，因为你就是味道本身。你的厨房像个刚结束战斗的废墟，但你在油烟和碗筷山中颠勺的样子帅极了。你崇尚大开大合的火候，相信新鲜食材在高温撞击下会迸发出最原始的灵魂。你做饭不是为了拍照，是为了让每一个吃的人都拍案叫绝。',
+    review:'你就是那种"闭着眼都能把路人馋哭"的天才。虽然你的水池里永远堆着脏碗，虽然你的抽油烟机常年滴油，但你端出来的那盆肉确实是人类文明的瑰宝。你做的东西狗都不吃？不，狗会为了抢一口跟你拼命。',
+    quote:'"量勺是什么？撒盐得靠手感！看这锅气，这就叫灵魂。赶紧吃，凉了就白瞎我这手颠勺了。"' },
+
+  IFTOA: { emoji:'💫', name:'灵动派的视觉大师',
+    dims:['直觉(I)','风味(F)','技法(T)','秩序(O)','审美(A)'],
+    portrait:'你具有极高的审美天赋和技法直觉。你在干净的台面上跳舞，不需要量勺，却能精准捕捉到风味的平衡。你擅长重塑食材，且必须让它以最华丽的姿态登场。',
+    review:'你是那种典型的"老天爷赏饭吃"。你做饭的过程是一种享受，成品更是视觉和味觉的双重盛宴。唯一的缺点是，你这种天赋型选手很难复刻，如果今天心情不好，你端出来的东西可能还不如一份外卖。',
+    quote:'"技法只是工具，审美才是灵魂。看这道菜的层次感，它在向你展示我的心情。"' },
+
+  IFTOU: { emoji:'🚌', name:'街头智慧的炼金术士',
+    dims:['直觉(I)','风味(F)','技法(T)','秩序(O)','实用(U)'],
+    portrait:'你是那种最具"性价比"的厨房高手。你有一套极其顺手的动线，不看菜谱但深谙调味逻辑。你最擅长用娴熟的技法让平凡的食材瞬间升华。你的厨房是高效的工厂，每一口锅都在为你对风味的直觉服务。',
+    review:'你是最靠谱的饭友，能在最短时间内搞定一桌硬菜。你对"好吃"的追求极其务实，拒绝一切虚头巴脑。但说实话，你做饭的时候有点像在开长途大巴，稳是真稳，但惊喜不多，你也懒得折腾什么新花样。',
+    quote:'"别整那些没用的装饰。技法到位了，路边摊的食材也能炒出锅气。趁热吃，这是对这盘菜最起码的尊重。"' },
+
+  IFTCA: { emoji:'🌀', name:'魔幻现实主义调味师',
+    dims:['直觉(I)','风味(F)','技法(T)','狂野(C)','审美(A)'],
+    portrait:'你是厨房里的疯子天才。你从不按理出牌，中式酱油配西式松露是你常见的操作。你享受那种技法重塑食材的过程，哪怕厨房炸了，你也要端出一盘视觉张力拉满的作品。你做饭时通常伴随着音乐和自我陶醉。',
+    review:'你是一个极具个人魅力的厨师，虽然你的"实验"偶尔会翻车，但翻车后的视觉效果也挺惊艳。你的这种"狂野美学"其实是在为你的失控买单。承认吧，你每次做出来的味道都不一样，但这正是你的信徒们迷恋你的地方。',
+    quote:'"我刚才加入了一点陈年波特酒来解构这道红烧肉。看这深邃的挂壁感，是不是很有生命在燃烧的悲剧美？"' },
+
+  IFTCU: { emoji:'🍺', name:'厨房里的流浪汉厨神',
+    dims:['直觉(I)','风味(F)','技法(T)','狂野(C)','实用(U)'],
+    portrait:'只要有一口锅和一身野路子技法，你就能把边角料化为神奇。你不在乎环境，不在乎摆盘，只在乎那股能让你酒友封神的扎实味道。',
+    review:'你是典型的"重口味爱好者"。你做的饭确实下饭，但也确实油腻。你那种在废墟中生存的技能让人惊叹，但你对卫生和均衡的蔑视也让人担忧。你不是在生活，你是在废墟里狂欢。',
+    quote:'"多放点辣椒，什么腥味都没了。卖相不重要，好吃就行。来，干了这盆！"' },
+
+  IBNOA: { emoji:'🍃', name:'森林系禅意隐士',
+    dims:['直觉(I)','均衡(B)','原味(N)','秩序(O)','审美(A)'],
+    portrait:'你是一位在都市里修行的隐者。你追求食材自然的状态，且认为下厨是一种冥想。你的动作轻柔，厨房永远清爽。你追求的是那种"透明感"的美味，摆盘时会用到路边的野花，每一口饭都是对身体的洗涤。',
+    review:'你是个极度体面的人，甚至体面到有些伪善。你做的东西确实健康，但也确实清淡到让人怀疑人生。你所谓的"大地的味道"，在重口味患者眼里就是"没洗干净的土味"。但没人能拒绝你端上桌时那份宁静的美。',
+    quote:'"不需要多余的调味，盐是唯一的媒介。你看这颗番茄的纹路，它在跟我交流它的成长史。"' },
+
+  IBNOU: { emoji:'🌾', name:'随性健康生活家',
+    dims:['直觉(I)','均衡(B)','原味(N)','秩序(O)','实用(U)'],
+    portrait:'你是那种直觉好、生活观念也健康的人。你不需要菜谱，靠经验感知食材的状态，相信新鲜的原料自己会说话。你的厨房保持着随手收拾的习惯，不追求精致，但也不邋遢。健康、快速、够吃，就是你的厨房哲学。',
+    review:'你是那种"不显山不露水但厨艺其实挺稳"的人。你做的东西不会让人惊叫，但每次都能让人满意。你对生活的态度是清醒且务实的：既不沉迷于仪式感，也不放弃对健康的基本要求。你是最好相处的厨房伙伴。',
+    quote:'"新鲜的东西不用复杂，焯了煎了就够了。少油少盐，身体是自己的。吃完我把碗洗了，今晚早点睡。"' },
+
+  IBNCA: { emoji:'🍀', name:'野生有机迷惑行为艺术家',
+    dims:['直觉(I)','均衡(B)','原味(N)','狂野(C)','审美(A)'],
+    portrait:'你是厨房里的"灵修者"。你崇尚食材的野性，随手把各种奇形怪状的蔬菜扔进锅里，还美其名曰"保留大地的呼吸"。你的厨房乱得像原始森林，但这不妨碍你花半小时调整自然光，拍出一张看起来像在清迈修行的摆盘照。',
+    review:'你所谓的"直觉调味"，其实就是忘了放盐。你所谓的"自然感"，本质上就是懒得洗菜。承认吧，你做的不是健康餐，是给肠胃的一场名为"自然"的霸凌。但你发在朋友圈的照片确实挺能骗赞。',
+    quote:'"我感受到这棵生菜在渴望与我交流。乱？这叫自然的熵增，你在这些交错的菜叶里看不到宇宙的构图吗？"' },
+
+  IBNCU: { emoji:'🥬', name:'随缘养生的糊弄学大师',
+    dims:['直觉(I)','均衡(B)','原味(N)','狂野(C)','实用(U)'],
+    portrait:'你是厨房里的终极泥石流。你的核心逻辑是：只要这玩意儿是绿色的、煮熟了，就是健康的一餐。你不讲究顺序，不讲究火候，甚至不讲究尊严。你在乱如战场的灶台前，靠直觉拼凑出一顿能维持生命的"草本燃料"。',
+    review:'你做的饭有一种"世界末日避难所"的既视感。你不是在追求原味，你只是单纯地不会用调味品。承认吧，你那锅绿油油的糊糊，连流浪猫看了都要绕道走。你不是在生活，你只是在苟活。',
+    quote:'"熟了就行，绿色就行。洗碗多累啊，直接对着锅吃，省下来的时间我可以多睡一会。"' },
+
+  IBTOA: { emoji:'🏗️', name:'雅致的均衡建筑师',
+    dims:['直觉(I)','均衡(B)','技法(T)','秩序(O)','审美(A)'],
+    portrait:'你像设计建筑一样设计你的晚餐。在有序的环境中，你凭经验施展技法，平衡营养与美感。你追求的是高度文明的烹饪方式，克制、优雅、且充满尊严。',
+    review:'你活得非常体面，甚至体面到有些无趣。你的每一餐都像是一场经过演习的展示。你对身体的尊重值得学习，但偶尔我们也想看你喝醉了酒乱炒一盘重油重盐的土豆丝，那才叫生活，而不是修行。',
+    quote:'"健康不代表牺牲味觉。我用这种构图赋予了低脂餐尊严。请慢用，每一口都是感性与理性的和谐。"' },
+
+  IBTOU: { emoji:'🎯', name:'清醒的极简生存派',
+    dims:['直觉(I)','均衡(B)','技法(T)','秩序(O)','实用(U)'],
+    portrait:'你是厨房里的效率之王。你有一套最省事的健康策略，动作娴熟得像肌肉记忆。你在有序的环境中快速解决战斗，拒绝一切浪费时间的修饰。',
+    review:'你活得非常清醒，但也非常无聊。你用最短的时间做出了最不出错的饭。你证明了生活可以被简化到极致，但这种简化也带走了所有的惊喜。你是一个完美的队友，但绝不是一个有趣的伴侣。',
+    quote:'"流程我已经跑了三年。营养够了，洗碗两分钟。生活没那么复杂，吃饭也是。"' },
+
+  IBTCA: { emoji:'🎬', name:'随性生活的仪式感信徒',
+    dims:['直觉(I)','均衡(B)','技法(T)','狂野(C)','审美(A)'],
+    portrait:'你拒绝被计划绑架，但你热爱美。你在厨房里即兴发挥，利用技法来拯救健康餐的乏味。虽然过程一团糟，但你最后的摆盘绝对有电影质感。你追求的是那种"不费力的时髦感"，即便背后是狼藉的现场。',
+    review:'你是一个极具迷惑性的厨师。看照片，你是生活大师；看现场，你是受灾群众。你对均衡的追求全靠心情，这导致你经常在"极度健康"和"极度放纵"之间反复横跳。你不是在修心，你是在玩角色扮演。',
+    quote:'"我刚才产生了一个绝妙的灵感，加了一勺巧克力酱进去调色。你看，这构图是不是很有赛博朋克的感觉？"' },
+
+  IBTCU: { emoji:'🏕️', name:'荒野求生实用主义者',
+    dims:['直觉(I)','均衡(B)','技法(T)','狂野(C)','实用(U)'],
+    portrait:'你是不折不扣的生存专家。你对食物没有任何花哨的幻想，高效、健康、管饱是你的核心。你不需要仪式感，也不在意环境的混乱，你有一套自己总结出来的"野路子"技法，专门对付各种边角料，且总能让它们变得能吃且不难吃。',
+    review:'你是那种哪怕流落荒岛也能活得比别人健壮的人。你对生活质量的放弃换来了极高的生存效率。你的这种"糊弄学"其实是对生活的一种反抗——既然都要吃下去，为什么要把时间浪费在洗碗和摆盘上？',
+    quote:'"菜谱是给不会做饭的人看的。这里有纤维、有蛋白，味道也还行。吃完我还要去忙别的呢，别废话，赶紧的一锅端。"' },
+};
+
+// ════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════
+let currentQ = 0;
+let answers  = new Array(20).fill(null);
+
+// ════════════════════════════════════════
+// SCREEN
+// ════════════════════════════════════════
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + id).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function startQuiz() {
+  currentQ = 0;
+  answers   = new Array(20).fill(null);
+  renderQuestion();
+  showScreen('quiz');
+}
+
+// ════════════════════════════════════════
+// QUIZ RENDER
+// ════════════════════════════════════════
+function renderQuestion() {
+  const q   = questions[currentQ];
+  const dim = dimensions[q[3]];
+
+  // Progress
+  const pct = Math.max(5, Math.round((currentQ / 20) * 100));
+  document.getElementById('progress-bar').style.width   = pct + '%';
+  document.getElementById('progress-label').textContent = `第 ${currentQ + 1} 题，共 20 题`;
+  document.getElementById('progress-count').textContent = `${currentQ + 1} / 20`;
+
+  // Dim badge
+  const badge       = document.getElementById('dim-badge');
+  badge.textContent = dim.name;
+  badge.style.background = dim.bg;
+  badge.style.color      = dim.color;
+  badge.style.border     = '1.5px solid ' + dim.color + '44';
+
+  // Question
+  document.getElementById('question-text').textContent = `${currentQ + 1}. ${q[0]}`;
+
+  // Options
+  const grid = document.getElementById('options-grid');
+  grid.innerHTML = '';
+  ['A', 'B'].forEach((letter, i) => {
+    const btn      = document.createElement('button');
+    btn.className  = 'option-btn' + (answers[currentQ] === letter ? ' selected' : '');
+    btn.innerHTML  = `<span class="option-key">${letter}</span><span class="option-text">${q[i + 1]}</span>`;
+    btn.onclick    = () => selectAnswer(letter);
+    grid.appendChild(btn);
+  });
+
+  // Nav
+  document.getElementById('btn-prev').style.visibility = currentQ > 0 ? 'visible' : 'hidden';
+  const isLast  = currentQ === 19;
+  const hasAns  = answers[currentQ] !== null;
+  const btnNext = document.getElementById('btn-next');
+  btnNext.textContent = isLast ? '查看结果 ✨' : '下一题 →';
+  btnNext.disabled    = !hasAns;
+}
+
+function selectAnswer(letter) {
+  answers[currentQ] = letter;
+  document.querySelectorAll('.option-btn').forEach((btn, i) => {
+    btn.classList.toggle('selected', (i === 0 && letter === 'A') || (i === 1 && letter === 'B'));
+  });
+  document.getElementById('btn-next').disabled = false;
+  // Auto-advance after brief pause
+  setTimeout(() => {
+    if (currentQ < 19) { currentQ++; renderQuestion(); }
+    else showResult();
+  }, 320);
+}
+
+function nextQuestion() {
+  if (answers[currentQ] === null) return;
+  if (currentQ < 19) { currentQ++; renderQuestion(); }
+  else showResult();
+}
+
+function prevQuestion() {
+  if (currentQ > 0) { currentQ--; renderQuestion(); }
+}
+
+// ════════════════════════════════════════
+// SCORING
+// ════════════════════════════════════════
+function calcCode() {
+  const scores = [0, 0, 0, 0, 0];
+  for (let i = 0; i < 20; i++) {
+    if (answers[i] === 'A') scores[questions[i][3]]++;
+  }
+  // A answers ≥ 2 out of 4 → first letter; else second letter
+  const code = dimensions.map((d, idx) => scores[idx] >= 2 ? d.la : d.lb).join('');
+  return { code, scores };
+}
+
+// ════════════════════════════════════════
+// SHOW RESULT
+// ════════════════════════════════════════
+function showResult() {
+  const { code, scores } = calcCode();
+  const p = P[code] || {
+    emoji: '🍳', name: '独一无二的神秘厨魂',
+    dims: [],
+    portrait: '你的下厨风格独特而难以定义，正是这种个性让你的每一顿饭都充满惊喜。',
+    review:   '继续探索你的厨魂吧！',
+    quote:    '"厨房是我最真实的地方。"'
+  };
+
+  // Code letters (each dim gets its own color)
+  document.getElementById('result-emoji').textContent = p.emoji;
+  document.getElementById('result-type-code').innerHTML = code.split('').map((c, i) =>
+    `<div class="code-letter d${i}">${c}</div>`
+  ).join('');
+  document.getElementById('result-type-name').textContent = '【' + p.name + '】';
+
+  // Dim tags
+  document.getElementById('result-dims').innerHTML = (p.dims || []).map((d, i) => {
+    const dim = dimensions[i];
+    return `<span class="result-dim-tag" style="color:${dim.color};border-color:${dim.color}44;background:${dim.bg}">${d}</span>`;
+  }).join('');
+
+  document.getElementById('result-portrait').textContent = p.portrait;
+  document.getElementById('result-review').textContent   = p.review;
+  document.getElementById('result-quote').textContent    = p.quote;
+
+  // Dim bars (how many A answers per dimension, bar grows toward A option)
+  document.getElementById('dim-summary').innerHTML = dimensions.map((dim, idx) => {
+    const pct = (scores[idx] / 4) * 100;
+    return `
+      <div class="dim-row">
+        <div class="dim-row-label-a">${dim.optA.split(' · ')[0]}</div>
+        <div class="dim-row-bar-wrap">
+          <div class="dim-row-bar" style="width:0%;background:${dim.color}" data-target="${pct}"></div>
+        </div>
+        <div class="dim-row-label-b">${dim.optB.split(' · ')[0]}</div>
+      </div>`;
+  }).join('');
+
+  showScreen('result');
+
+  // Animate bars
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    document.querySelectorAll('.dim-row-bar').forEach(bar => {
+      bar.style.width = bar.dataset.target + '%';
+    });
+  }));
+}
+</script>
+</body>
+</html>
