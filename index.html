@@ -677,11 +677,6 @@ function selectAnswer(letter) {
     btn.classList.toggle('selected', (i === 0 && letter === 'A') || (i === 1 && letter === 'B'));
   });
   document.getElementById('btn-next').disabled = false;
-  // Auto-advance after brief pause
-  setTimeout(() => {
-    if (currentQ < 19) { currentQ++; renderQuestion(); }
-    else showResult();
-  }, 320);
 }
 
 function nextQuestion() {
